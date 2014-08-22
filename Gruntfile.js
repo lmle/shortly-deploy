@@ -5,10 +5,9 @@ module.exports = function(grunt) {
     concat: {
       dist: {
         src: [
-          'public/client/*.js',
-          'public/lib/*.js'
+          'public/client/*.js'
         ],
-        dest: ['public/client/production.js']
+        dest: 'public/client/production.js'
       }
     },
 
@@ -37,7 +36,8 @@ module.exports = function(grunt) {
     jshint: {
       files: [
         // Add filespec list here
-        'public/**/*.js'
+        // 'public/client/production.min.js'
+        'public/client/production.js'
       ],
       options: {
         force: 'true',
