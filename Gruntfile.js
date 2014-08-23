@@ -3,12 +3,15 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     concat: {
-      dist: {
-        src: [
-          'public/client/*.js'
-        ],
-        dest: 'public/client/production.js'
+      client: {
+        src: 'public/client/*.js',
+        dest: 'public/client/production_client.js'
       }
+      // ,
+      // lib: {
+      //   src: 'public/lib/*.js',
+      //   dest: 'public/lib/production_lib.js'
+      // }
     },
 
     mochaTest: {
@@ -27,20 +30,24 @@ module.exports = function(grunt) {
     },
 
     uglify: {
-      build: {
-        src: 'public/client/production.js',
-        dest: 'public/client/production.min.js'
+      client: {
+        src: 'public/client/production_client.js',
+        dest: 'public/client/production_client.min.js'
       }
+      // ,
+      // lib: {
+      //   src: 'public/lib/production_lib.js',
+      //   dest: 'public/lib/production_lib.min.js'
+      // }
     },
 
     jshint: {
       files: [
         // Add filespec list here
-        // 'public/client/production.min.js'
-        'public/client/production.js'
+        'public/client/*.js'
       ],
       options: {
-        force: 'true',
+        // force: 'true',
         jshintrc: '.jshintrc',
         ignores: [
           'public/lib/**/*.js',
@@ -50,6 +57,10 @@ module.exports = function(grunt) {
     },
 
     cssmin: {
+      minify: {
+        src: 'public/style.css',
+        dest: 'public/style.min.css'
+      }
     },
 
     watch: {
@@ -116,13 +127,12 @@ module.exports = function(grunt) {
     }
   });
 
+
   grunt.registerTask('deploy', [
     // add your deploy tasks here
+    'jshint',
     'concat',
     'uglify',
-    'jshint',
-    'mochaTest'
+    'watch'
   ]);
-
-
 };
