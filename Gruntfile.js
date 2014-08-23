@@ -50,6 +50,8 @@ module.exports = function(grunt) {
         // force: 'true',
         jshintrc: '.jshintrc',
         ignores: [
+          'public/client/production_client.js',
+          'public/client/production_client.min.js',
           'public/lib/**/*.js',
           'public/dist/**/*.js'
         ]
