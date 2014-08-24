@@ -1,6 +1,9 @@
 // var Bookshelf = require('bookshelf');
 var mongoose = require('mongoose');
 var path = require('path');
+var crypto = require('crypto');
+var bcrypt = require('bcrypt-nodejs');
+var Promise = require('bluebird');
 
 // var db = Bookshelf.initialize({
 //   client: 'sqlite3',
@@ -41,6 +44,19 @@ module.exports.LinkSchema = new mongoose.Schema({
   visits: Number
 });
 
+module.exports.LinkSchema.post('init', function (doc) {
+  console.log('@@@@@@@@@@@@@@@@@@@@@@@@@ IN INIT');
+  console.log('IN INIT DOC', doc);
+  var shasum = crypto.createHash('sha1');
+  shasum.update(doc.url);
+  doc.code = shasum.digest('hex').slice(0, 5);
+});
+
+//       var shasum = crypto.createHash('sha1');
+//       shasum.update(model.get('url'));
+//       model.set('code', shasum.digest('hex').slice(0, 5));
+//
+
 // db.knex.schema.hasTable('users').then(function(exists) {
 //   if (!exists) {
 //     db.knex.schema.createTable('users', function (user) {
@@ -59,3 +75,38 @@ module.exports.UserSchema = new mongoose.Schema({
   username: String,
   password: String
 });
+
+module.exports.UserSchema.post('init', function(doc) {
+  var cipher = Promise.promisify(bcrypt.hash);
+  cipher(doc.password, null, null).bind(doc)
+    .then(function(hash) {
+      doc.password = hash;
+      this.set('password', hash);
+    });
+
+  doc.comparePassword = function(attemptedPassword, callback) {
+    bcrypt.compare(attemptedPassword, this.password, function(err, isMatch) {
+      callback(isMatch);
+    });
+  };
+});
+
+// var User = db.Model.extend({
+//   tableName: 'users',
+//   hasTimestamps: true,
+//   initialize: function(){
+//     this.on('creating', this.hashPassword);
+//   },
+//   comparePassword: function(attemptedPassword, callback) {
+//     bcrypt.compare(attemptedPassword, this.get('password'), function(err, isMatch) {
+//       callback(isMatch);
+//     });
+//   },
+//   hashPassword: function(){
+//     var cipher = Promise.promisify(bcrypt.hash);
+//     return cipher(this.get('password'), null, null).bind(this)
+//       .then(function(hash) {
+//         this.set('password', hash);
+//       });
+//   }
+// });
